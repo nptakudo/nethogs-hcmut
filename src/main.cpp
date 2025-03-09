@@ -128,7 +128,7 @@ bool wait_for_next_trigger() {
     }
   } else {
     // If select() not possible, pause to prevent 100%
-    usleep(3000);
+    usleep(1000);
   }
   return true;
 }
