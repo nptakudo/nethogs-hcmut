@@ -227,9 +227,11 @@ void Line::show(int row, unsigned int proglen, unsigned int devlen) {
 void Line::log() {
   std::cout << m_name;
   if (showcommandline && m_cmdline)
-    std::cout << ' ' << m_cmdline;
-  std::cout << '/' << m_pid << '/' << m_uid << "\t" << sent_value << "\t"
-            << recv_value << std::endl;
+  //   std::cout << ' ' << m_cmdline;
+  // std::cout << '/' << m_pid << '/' << m_uid << "\t" << sent_value << "\t"
+            // << recv_value << std::endl;
+  std::cout << "network_traffic,cmdline=" << m_cmdline << ",pid=" << m_pid << "," 
+  << " sent_value=" << sent_value << ",recv_value=" << recv_value << std::endl;
 }
 
 int get_devlen(Line *lines[], int nproc, int rows) {
@@ -327,7 +329,7 @@ void ui_tick() {
 }
 
 void show_trace(Line *lines[], int nproc) {
-  std::cout << "\nRefreshing:\n";
+  // std::cout << "\nRefreshing:\n";
 
   /* print them */
   for (int i = 0; i < nproc; i++) {
@@ -336,11 +338,11 @@ void show_trace(Line *lines[], int nproc) {
   }
 
   /* print the 'unknown' connections, for debugging */
-  for (auto it = unknowntcp->connections.begin();
-       it != unknowntcp->connections.end(); ++it) {
-    std::cout << "Unknown connection: " << (*it)->refpacket->gethashstring()
-              << std::endl;
-  }
+  // for (auto it = unknowntcp->connections.begin();
+  //      it != unknowntcp->connections.end(); ++it) {
+  //   std::cout << "Unknown connection: " << (*it)->refpacket->gethashstring()
+  //             << std::endl;
+  // }
 }
 
 void show_ncurses(Line *lines[], int nproc) {
