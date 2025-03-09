@@ -224,14 +224,28 @@ void Line::show(int row, unsigned int proglen, unsigned int devlen) {
   mvaddstr(row, column_offset_unit, desc_view_mode[viewMode]);
 }
 
+#include <chrono>
+
+// Function to get the current UTC timestamp as Unix timestamp
+std::string get_utc_timestamp() {
+  auto now = std::chrono::system_clock::now();
+  auto epoch = now.time_since_epoch();
+  auto seconds = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
+  return std::to_string(seconds);  // Convert to string
+}
+
 void Line::log() {
-  std::cout << m_name;
-  if (showcommandline && m_cmdline)
-  //   std::cout << ' ' << m_cmdline;
-  // std::cout << '/' << m_pid << '/' << m_uid << "\t" << sent_value << "\t"
-            // << recv_value << std::endl;
-  std::cout << "network_traffic,cmdline=" << m_cmdline << ",pid=" << m_pid << "," 
-  << " sent_value=" << sent_value << ",recv_value=" << recv_value << std::endl;
+  std::string cmdline_str(m_name);  // Convert const char* to std::string
+  std::replace(cmdline_str.begin(), cmdline_str.end(), ' ', '\0');
+  std::string timestamp = get_utc_timestamp();
+  // Check if the cmdline contains "unknow" or if both sent_value and recv_value are 0
+  if (cmdline_str.find("unknow") == std::string::npos && sent_value != 0 && recv_value != 0) {
+    std::cout <<  "network_traffic,comm=" << cmdline_str << ",pid=" << m_pid << " sent_value=" << sent_value <<  ",recv_value=" << recv_value << " " << timestamp << std::endl;
+  }
+//  if (showcommandline && m_cmdline)
+//    std::cout << ' ' << m_cmdline;
+//  std::cout << '/' << m_pid << '/' << m_uid << "\t" << sent_value << "\t"
+//            << recv_value << std::endl;
 }
 
 int get_devlen(Line *lines[], int nproc, int rows) {
@@ -329,8 +343,8 @@ void ui_tick() {
 }
 
 void show_trace(Line *lines[], int nproc) {
-  // std::cout << "\nRefreshing:\n";
-
+//  std::cout << "\nRefreshing:\n";
+//  std::cout << "\n";
   /* print them */
   for (int i = 0; i < nproc; i++) {
     lines[i]->log();
@@ -338,11 +352,11 @@ void show_trace(Line *lines[], int nproc) {
   }
 
   /* print the 'unknown' connections, for debugging */
-  // for (auto it = unknowntcp->connections.begin();
-  //      it != unknowntcp->connections.end(); ++it) {
-  //   std::cout << "Unknown connection: " << (*it)->refpacket->gethashstring()
-  //             << std::endl;
-  // }
+//  for (auto it = unknowntcp->connections.begin();
+//       it != unknowntcp->connections.end(); ++it) {
+//    std::cout << "Unknown connection: " << (*it)->refpacket->gethashstring()
+//              << std::endl;
+//  }
 }
 
 void show_ncurses(Line *lines[], int nproc) {

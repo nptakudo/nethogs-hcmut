@@ -70,17 +70,17 @@ bool getLocal(const char *device, bool tracemode) {
       struct sockaddr_in *addr = (struct sockaddr_in *)ifa->ifa_addr;
       local_addrs = new local_addr(addr->sin_addr.s_addr, local_addrs);
 
-      if (tracemode || DEBUG) {
-        printf("Adding local address: %s\n", inet_ntoa(addr->sin_addr));
-      }
+//      if (tracemode || DEBUG) {
+//       printf("Adding local address: %s\n", inet_ntoa(addr->sin_addr));
+//      }
     } else if (family == AF_INET6) {
       struct sockaddr_in6 *addr = (struct sockaddr_in6 *)ifa->ifa_addr;
       local_addrs = new local_addr(&addr->sin6_addr, local_addrs);
-      if (tracemode || DEBUG) {
-        char host[512];
-        printf("Adding local address: %s\n",
-               inet_ntop(AF_INET6, &addr->sin6_addr, host, sizeof(host)));
-      }
+//      if (tracemode || DEBUG) {
+//        char host[512];
+//        printf("Adding local address: %s\n",
+//               inet_ntop(AF_INET6, &addr->sin6_addr, host, sizeof(host)));
+//      }
     }
   }
   return true;

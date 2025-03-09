@@ -49,7 +49,7 @@ struct dp_handle *dp_fillhandle(pcap_t *phandle) {
 
   switch (retval->linktype) {
   case (DLT_EN10MB):
-    fprintf(stdout, "Ethernet link detected\n");
+//    fprintf(stdout, "Ethernet link detected\n");
     break;
   case (DLT_PPP):
     fprintf(stdout, "PPP link detected\n");
