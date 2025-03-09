@@ -240,7 +240,7 @@ void Line::log() {
   std::string timestamp = get_utc_timestamp();
   // Check if the cmdline contains "unknow" or if both sent_value and recv_value are 0
   if (cmdline_str.find("unknow") == std::string::npos && sent_value != 0 && recv_value != 0) {
-    std::cout <<  "network_traffic,comm=" << cmdline_str << ",pid=" << m_pid << " sent_value=" << sent_value <<  ",recv_value=" << recv_value << " " << timestamp << std::endl;
+    std::cout <<  "network_traffic,comm=" << cmdline_str << ",pid=" << m_pid << " sent_value=" << sent_value <<  ",recv_value=" << recv_value << std::endl;
   }
 //  if (showcommandline && m_cmdline)
 //    std::cout << ' ' << m_cmdline;
