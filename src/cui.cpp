@@ -228,30 +228,23 @@ void Line::show(int row, unsigned int proglen, unsigned int devlen) {
 #include <chrono>
 #include <thread>
 
-// Function to get the current UTC timestamp as Unix timestamp
-std::string get_utc_timestamp() {
-  auto now = std::chrono::system_clock::now();
-  auto epoch = now.time_since_epoch();
-  auto seconds = std::chrono::duration_cast<std::chrono::seconds>(epoch).count();
-  return std::to_string(seconds);  // Convert to string
-}
-
 void Line::log() {
     std::string cmdline_str(m_name);  // Convert const char* to std::string
     std::replace(cmdline_str.begin(), cmdline_str.end(), ' ', '_');  // Replace spaces with underscores
-    std::string timestamp = get_utc_timestamp();  // Assuming this function returns the timestamp as a string
 
     // InfluxDB details
-    const std::string INFLUXDB_HOST = "http://146.190.97.107:8086";  // Change if needed
-    const std::string BUCKET_NAME = "cpp2influx";
+    const std::string INFLUXDB_HOST = "";  // Change if needed
+    const std::string BUCKET_NAME = "Network-metrics";
     const std::string ORG_NAME = "grafana";
     const std::string API_TOKEN = "";
 
     // Ensure the cmdline does not contain "unknow" and that values are not zero
-    if (cmdline_str.find("unknow") == std::string::npos && sent_value != 0 && recv_value != 0) {
-        // Format data in InfluxDB Line Protocol
+    if (cmdline_str.find("unknow") == std::string::npos) {
+        std::string ip_address = "";
+	// Format data in InfluxDB Line Protocol
         std::string lineProtocol = "network_traffic,comm=" + cmdline_str +
                                    ",pid=" + std::to_string(m_pid) +
+				   ",ip=" + ip_address +
                                    " sent_value=" + std::to_string(sent_value) +
                                    ",recv_value=" + std::to_string(recv_value);
 
