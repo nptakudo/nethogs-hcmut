@@ -224,7 +224,9 @@ void Line::show(int row, unsigned int proglen, unsigned int devlen) {
   mvaddstr(row, column_offset_unit, desc_view_mode[viewMode]);
 }
 
+#include <httplib.h>
 #include <chrono>
+#include <thread>
 
 // Function to get the current UTC timestamp as Unix timestamp
 std::string get_utc_timestamp() {
@@ -235,17 +237,48 @@ std::string get_utc_timestamp() {
 }
 
 void Line::log() {
-  std::string cmdline_str(m_name);  // Convert const char* to std::string
-  std::replace(cmdline_str.begin(), cmdline_str.end(), ' ', '\0');
-  std::string timestamp = get_utc_timestamp();
-  // Check if the cmdline contains "unknow" or if both sent_value and recv_value are 0
-  if (cmdline_str.find("unknow") == std::string::npos && sent_value != 0 && recv_value != 0) {
-    std::cout <<  "network_traffic,comm=" << cmdline_str << ",pid=" << m_pid << " sent_value=" << sent_value <<  ",recv_value=" << recv_value << std::endl;
-  }
-//  if (showcommandline && m_cmdline)
-//    std::cout << ' ' << m_cmdline;
-//  std::cout << '/' << m_pid << '/' << m_uid << "\t" << sent_value << "\t"
-//            << recv_value << std::endl;
+    std::string cmdline_str(m_name);  // Convert const char* to std::string
+    std::replace(cmdline_str.begin(), cmdline_str.end(), ' ', '_');  // Replace spaces with underscores
+    std::string timestamp = get_utc_timestamp();  // Assuming this function returns the timestamp as a string
+
+    // InfluxDB details
+    const std::string INFLUXDB_HOST = "http://146.190.97.107:8086";  // Change if needed
+    const std::string BUCKET_NAME = "cpp2influx";
+    const std::string ORG_NAME = "grafana";
+    const std::string API_TOKEN = "";
+
+    // Ensure the cmdline does not contain "unknow" and that values are not zero
+    if (cmdline_str.find("unknow") == std::string::npos && sent_value != 0 && recv_value != 0) {
+        // Format data in InfluxDB Line Protocol
+        std::string lineProtocol = "network_traffic,comm=" + cmdline_str +
+                                   ",pid=" + std::to_string(m_pid) +
+                                   " sent_value=" + std::to_string(sent_value) +
+                                   ",recv_value=" + std::to_string(recv_value);
+
+        // Construct InfluxDB API URL
+        std::string url = "/api/v2/write?org=" + ORG_NAME + "&bucket=" + BUCKET_NAME + "&precision=s";
+
+        // Create HTTP client
+        httplib::Client cli(INFLUXDB_HOST.c_str());
+
+        // Set headers
+        httplib::Headers headers = {
+            {"Authorization", "Token " + API_TOKEN},
+            {"Content-Type", "text/plain"}
+        };
+
+        // Send HTTP POST request
+        auto res = cli.Post(url.c_str(), headers, lineProtocol, "text/plain");
+
+        // Handle response
+        if (res && res->status == 204) {
+            std::cout << "Data sent successfully: " << lineProtocol << std::endl;
+        } else {
+            std::cerr << "Failed to send data. HTTP Status: " 
+                      << (res ? std::to_string(res->status) : "No response") 
+                      << std::endl;
+        }
+    }
 }
 
 int get_devlen(Line *lines[], int nproc, int rows) {
