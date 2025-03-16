@@ -233,13 +233,13 @@ void Line::log() {
     std::replace(cmdline_str.begin(), cmdline_str.end(), ' ', '_');  // Replace spaces with underscores
 
     // InfluxDB details
-    const std::string INFLUXDB_HOST = "";  // Change if needed
+    const std::string INFLUXDB_HOST = "";
     const std::string BUCKET_NAME = "Network-metrics";
     const std::string ORG_NAME = "grafana";
     const std::string API_TOKEN = "";
 
     // Ensure the cmdline does not contain "unknow" and that values are not zero
-    if (cmdline_str.find("unknow") == std::string::npos) {
+    if (cmdline_str.find("unknow") == std::string::npos && std::to_string(m_pid) != "0") {
         std::string ip_address = "";
 	// Format data in InfluxDB Line Protocol
         std::string lineProtocol = "network_traffic,comm=" + cmdline_str +
@@ -248,7 +248,9 @@ void Line::log() {
                                    " sent_value=" + std::to_string(sent_value) +
                                    ",recv_value=" + std::to_string(recv_value);
 
-        // Construct InfluxDB API URL
+	// std::cout << lineProtocol << std::endl;
+
+	// Construct InfluxDB API URL
         std::string url = "/api/v2/write?org=" + ORG_NAME + "&bucket=" + BUCKET_NAME + "&precision=s";
 
         // Create HTTP client
